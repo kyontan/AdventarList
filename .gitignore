@@ -29,3 +29,6 @@ Temporary Items
 node_modules
 
 .sass-cache
+
+db/*.db
+
