@@ -1,31 +1,36 @@
 class CreateTables < ActiveRecord::Migration
   def change
-  	create_table :calendars do |t|
-  		t.string :title
-  		t.string :description
-  		t.string :url
+    create_table :calendars, id: false do |t|
+      t.string :title
+      t.string :description
+      t.string :id
+      t.string :service
 
-  		t.timestamps null: false
-  	end
+      t.timestamps null: false
+    end
 
-  	create_table :writers do |t|
-  		t.string :name
-  		t.string :service_id
-  		t.string :service
+    add_index :calendars, [:id, :service], unique: true
 
-  		t.timestamps null: false
-  	end
+    create_table :writers, id: false do |t|
+      t.string :name
+      t.string :id
+      t.string :service
 
-  	create_table :articles do |t|
-			t.string :title
-  		t.string :description
-  		t.string :url
-  		t.date :date
+      t.timestamps null: false
+    end
 
-  		t.timestamps null: false
+    add_index :writers, [:id, :service], unique: true
 
-  		t.belongs_to :calendar
-  		t.belongs_to :writer
-  	end
+    create_table :articles do |t|
+      t.string :title
+      t.string :description
+      t.string :url
+      t.date :date
+
+      t.timestamps null: false
+
+      t.belongs_to :calendar
+      t.belongs_to :writer
+    end
   end
 end

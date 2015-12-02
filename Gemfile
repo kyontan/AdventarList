@@ -4,6 +4,7 @@ gem "sinatra"
 
 gem "sqlite3"
 gem "sinatra-activerecord", require: "sinatra/activerecord"
+gem "composite_primary_keys"
 gem "rake"
 
 gem "dotenv"
@@ -14,4 +15,6 @@ group :development do
 	gem "thin", require: false
 	gem "better_errors"
 	gem "binding_of_caller", require: false
+
+	gem "nokogiri", require: false
 end

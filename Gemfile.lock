@@ -23,6 +23,8 @@ GEM
       debug_inspector (>= 0.0.1)
     builder (3.2.2)
     coderay (1.1.0)
+    composite_primary_keys (8.1.1)
+      activerecord (~> 4.2.0)
     daemons (1.2.3)
     debug_inspector (0.0.2)
     dotenv (2.0.2)
@@ -31,7 +33,10 @@ GEM
     i18n (0.7.0)
     json (1.8.3)
     method_source (0.8.2)
+    mini_portile2 (2.0.0)
     minitest (5.8.3)
+    nokogiri (1.6.7)
+      mini_portile2 (~> 2.0.0.rc2)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -66,7 +71,9 @@ PLATFORMS
 DEPENDENCIES
   better_errors
   binding_of_caller
+  composite_primary_keys
   dotenv
+  nokogiri
   pry
   rake
   shotgun

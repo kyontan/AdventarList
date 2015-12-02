@@ -1,11 +1,15 @@
 class Calendar < ActiveRecord::Base
-	has_many :articles
+  self.primary_keys = :id, :service
+
+  has_many :articles
 end
 
 class Writer < ActiveRecord::Base
-	has_many :articles
+  self.primary_keys = :id, :service
+
+  has_many :articles
 end
 
 class Article < ActiveRecord::Base
-	belongs_to :calendar
+  belongs_to :calendar
 end

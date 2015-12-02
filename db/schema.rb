@@ -24,20 +24,25 @@ ActiveRecord::Schema.define(version: 20151202165427) do
     t.integer  "writer_id"
   end
 
-  create_table "calendars", force: :cascade do |t|
+  create_table "calendars", id: false, force: :cascade do |t|
     t.string   "title"
     t.string   "description"
-    t.string   "url"
+    t.string   "id"
+    t.string   "service"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
   end
 
-  create_table "writers", force: :cascade do |t|
+  add_index "calendars", ["id", "service"], name: "index_calendars_on_id_and_service", unique: true
+
+  create_table "writers", id: false, force: :cascade do |t|
     t.string   "name"
-    t.string   "service_id"
+    t.string   "id"
     t.string   "service"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_index "writers", ["id", "service"], name: "index_writers_on_id_and_service", unique: true
 
 end
