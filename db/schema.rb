@@ -27,22 +27,22 @@ ActiveRecord::Schema.define(version: 20151202165427) do
   create_table "calendars", id: false, force: :cascade do |t|
     t.string   "title"
     t.string   "description"
-    t.string   "id"
+    t.string   "in_service_id"
     t.string   "service"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
-  add_index "calendars", ["id", "service"], name: "index_calendars_on_id_and_service", unique: true
+  add_index "calendars", ["in_service_id", "service"], name: "index_calendars_on_in_service_id_and_service", unique: true
 
   create_table "writers", id: false, force: :cascade do |t|
     t.string   "name"
-    t.string   "id"
+    t.string   "in_service_id"
     t.string   "service"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
-  add_index "writers", ["id", "service"], name: "index_writers_on_id_and_service", unique: true
+  add_index "writers", ["in_service_id", "service"], name: "index_writers_on_in_service_id_and_service", unique: true
 
 end
