@@ -1,12 +1,17 @@
 class Calendar < ActiveRecord::Base
-  self.primary_keys = :id, :service
-
   has_many :articles
+
+  def url
+    case service
+    when "adventar"
+      "http://www.adventar.org/calendars/#{in_service_id}"
+    when "qiita"
+      "http://qiita.com/advent-calendar/#{Date.today.year}/#{in_service_id}"
+    end
+  end
 end
 
 class Writer < ActiveRecord::Base
-  self.primary_keys = :id, :service
-
   has_many :articles
 end
 

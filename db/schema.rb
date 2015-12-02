@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 20151202165427) do
     t.integer  "writer_id"
   end
 
-  create_table "calendars", id: false, force: :cascade do |t|
+  create_table "calendars", force: :cascade do |t|
     t.string   "title"
     t.string   "description"
     t.string   "in_service_id"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 20151202165427) do
 
   add_index "calendars", ["in_service_id", "service"], name: "index_calendars_on_in_service_id_and_service", unique: true
 
-  create_table "writers", id: false, force: :cascade do |t|
+  create_table "writers", force: :cascade do |t|
     t.string   "name"
     t.string   "in_service_id"
     t.string   "service"

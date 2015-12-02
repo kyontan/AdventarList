@@ -4,7 +4,6 @@ gem "sinatra"
 
 gem "sqlite3"
 gem "sinatra-activerecord", require: "sinatra/activerecord"
-gem "composite_primary_keys"
 gem "rake"
 
 gem "dotenv"
