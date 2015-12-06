@@ -30,10 +30,10 @@ configure do
   # use Rack::Csrf, raise: true
 
   enable :prefixed_redirects
-  # set :haml, attr_wrapper: ?"
-  # set :haml, format: :html5
-  # set :haml, cdata: false
-  # set :scss, style: :expanded
+  set :haml, attr_wrapper: ?"
+  set :haml, format: :html5
+  set :haml, cdata: false
+  set :scss, style: :expanded
   # set :markdown, filter_html: true
   set :database, {adapter: "sqlite3", database: "db/#{settings.environment}.sqlite3"}
 end
@@ -42,11 +42,27 @@ helpers do
   def h(text)
     Rack::Utils.escape_html(text)
   end
+
+  # 12月以外は前の年を返す
+  def get_year
+    today = Date.today
+    if today.month == 12
+      today.year
+    else
+      today.year - 1
+    end
+  end
 end
 
 get "/?" do
-  erb :index
+  # @date = Date.today
+  @date = Date.parse("12/3")
+  @articles = Article.where(date: @date).order(:updated_at).reverse
+
+  haml :index
 end
+
+# get %r{/\d{4}/\d{4}/\d{4}}
 
 get "/css/*" do
   file_name = params[:splat].first

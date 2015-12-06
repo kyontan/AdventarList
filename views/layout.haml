@@ -1,0 +1,45 @@
+!!!
+%html(lang="ja")
+  %head
+    %meta(charset="UTF-8")
+    %meta(content="IE=edge" http-equiv="X-UA-Compatible")
+    %meta(content="initial-scale=1.0, width=device-width" name="viewport")
+    %title Adventar::List
+
+    -# css
+    %link(rel="stylesheet" href="/normalize.css")
+    %link(rel="stylesheet" href="/css/style.css")
+
+    -# favicon
+
+    %link(rel="shortcut icon" href="favicon.ico")
+
+    -# ie
+    /[if lt IE 9]
+      %script(src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js")
+      %script(src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js")
+
+  %body
+    %header
+      %h1<
+        %a{href: to(?/)}> Adventar::List
+
+      %a(href = "http://www.adventar.org")< Adventar
+      と
+      %a(href = "http://qiita.com/advent-calendar")< Qiita Advent Calendar
+      に投稿された記事を日付毎に一覧出来るサイト&nbsp;
+      %small< (毎時30分に更新します)
+      -# %small< (更新終了しました。)
+
+    = yield if block_given?
+
+    %footer
+      %hr
+      &copy;&nbsp;
+      %a(href = "https://monora.me")> kyontan
+      &nbsp;(
+      %a.writer(href = "https://twitter.com/sukukyon")> @sukukyon
+      )
+
+    %script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
+    %script(src="/js/script.js")

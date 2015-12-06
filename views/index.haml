@@ -1,0 +1,37 @@
+%main
+  - date_fmt = "%Y/%m/%d"
+  - unless @date.day == 1
+    - day_str = @date.prev_day.strftime(date_fmt)
+    %a#link-prev{href: to(day_str)}= "#{day_str}の記事一覧"
+
+    %h2<
+      %time>= @date.strftime('%Y/%m/%d')
+      の記事
+
+  - unless @date.day == 25
+    - day_str = @date.next_day.strftime(date_fmt)
+    %a#link-next{href: to(day_str)}= "#{day_str}の記事一覧"
+  - if Date.today.day == 25
+    Merry christmas!
+
+  -# %h1 Qiita Advent Calendar
+  - if @articles.empty?
+    %div.no-article
+      記事がありません
+  - else
+    %table#articles
+      %thead
+        %tr
+          %th.theme Theme
+          %th.title Article
+          %th.writer Writer
+      - @articles.each do |article|
+        - calendar = article.calendar
+        - writer = article.writer
+        %tr
+          %td.theme
+            %a{href: calendar.url}>= calendar.title
+          %td.title
+            %a{href: article.url}>= article.title
+          %td.writer
+            %a.writer{href: writer.url}>= writer.name
