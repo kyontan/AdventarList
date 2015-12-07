@@ -16,12 +16,16 @@ require "json"
 def parse_document(url)
   charset = nil
 
-  html = open(url) do |f|
-    charset = f.charset
-    f.read
-  end
+  begin
+    html = open(url) do |f|
+      charset = f.charset
+      f.read
+    end
 
-  Nokogiri::HTML.parse(html, nil, charset)
+    return Nokogiri::HTML.parse(html, nil, charset)
+  rescue
+    return nil
+  end
 end
 
 def update_adventar
@@ -48,6 +52,8 @@ def update_adventar
 
   Calendar.all.each do |cal|
     doc = parse_document(cal.url)
+    next if doc.nil?
+
     doc.css("table.mod-entryList tr").each do |article_tree|
       user_name = article_tree.css(".mod-entryList-user a").text
       user_id   = article_tree.css(".mod-entryList-user a").attr("href").value.match(/\d+$/)[0]
