@@ -64,6 +64,10 @@ helpers do
 
     date
   end
+
+  def supported_service
+    Calendar.select(:service).uniq.map(&:service)
+  end
 end
 
 get "/?" do
@@ -88,6 +92,30 @@ get %r{^/((?:20)?\d{2}/12/\d{1,2})/?$} do
   pass if @date.nil?
 
   @articles = Article.where(date: @date).order(:updated_at).reverse
+
+  haml :index
+end
+
+get "/calendar/:service/:in_service_id/?" do
+  pass unless supported_service.include?(params[:service])
+
+  @service       = params[:service]
+  @in_service_id = params[:in_service_id]
+
+  @calendar = Calendar.find_by(service: @service, in_service_id: @in_service_id)
+  @articles = @calendar.articles.order(:date)
+
+  haml :index
+end
+
+get "/user/:service/:in_service_id/?" do
+  pass unless supported_service.include?(params[:service])
+
+  @service       = params[:service]
+  @in_service_id = params[:in_service_id]
+
+  @user = Writer.find_by(service: @service, in_service_id: @in_service_id)
+  @articles = @user.articles.order(:date)
 
   haml :index
 end
