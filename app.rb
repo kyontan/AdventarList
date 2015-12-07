@@ -52,6 +52,18 @@ helpers do
       today.year - 1
     end
   end
+
+  def parse_date(date_str)
+    begin
+      date = Date.parse(date_str)
+    rescue ArgumentError
+      return nil
+    end
+
+    return nil if 25 < date.day
+
+    date
+  end
 end
 
 get "/?" do
@@ -62,7 +74,24 @@ get "/?" do
   haml :index
 end
 
-# get %r{/\d{4}/\d{4}/\d{4}}
+get %r{^/(12/\d{1,2})/?$} do
+  date = parse_date(params[:captures].first)
+
+  pass if date.nil?
+
+  redirect to("/#{get_year}/#{date.month}/#{date.day}")
+end
+
+
+get %r{^/((?:20)?\d{2}/12/\d{1,2})/?$} do
+  @date = parse_date(params[:captures].first)
+
+  pass if @date.nil?
+
+  @articles = Article.where(date: @date).order(:updated_at).reverse
+
+  haml :index
+end
 
 get "/css/*" do
   file_name = params[:splat].first
