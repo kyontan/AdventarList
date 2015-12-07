@@ -38,13 +38,14 @@ def update_adventar
 
     calendars.each do |p|
       id, title = p["id"], p["title"]
-      unless Calendar.exists?(in_service_id: id, service: "adventar")
-        puts "Add calendar id: #{id}, title: #{title}"
-        Calendar.create(in_service_id: id,
-                        title: title,
-                        service: "adventar"
-                        )
-      end
+      calendar = Calendar.find_or_create_by(in_service_id: id, service: "adventar")
+      attrs = {
+        in_service_id: id,
+        title: title,
+        service: "adventar"
+      }
+      calendar.attributes = attrs
+      puts "calendar id: #{id}, title: #{title}" if calendar.changed?
     end
   end
 
@@ -69,26 +70,33 @@ def update_adventar
         url = url.value
       end
 
-      unless Writer.exists?(in_service_id: user_id, service: "adventar")
-        puts "New user: #{user_name}, id: #{user_id}"
-        Writer.create(name: user_name,
-                      in_service_id: user_id,
-                      service: "adventar"
-                      )
-      end
+      # Writer
+
+      writer = Writer.find_or_create_by(in_service_id: user_id, service: "adventar")
+      attrs = {
+        name: user_name,
+        in_service_id: user_id,
+        service: "adventar"
+      }
+      writer.attributes = attrs
+      puts "user: #{user_name}, id: #{user_id}" if writer.changed?
 
       writer = Writer.where(in_service_id: user_id, service: "adventar").first
 
-      unless Article.exists?(date: date, calendar: cal)
-        puts "New article: Calendar##{cal.in_service_id}, title: #{title}"
-        Article.create(title: title,
-                       description: desc,
-                       url: url,
-                       date: date,
-                       calendar: cal,
-                       writer: writer
-                       )
-      end
+      # Article
+      article = Article.find_or_create_by(date: date, calendar: cal)
+      attrs = {
+        title: title,
+        description: desc,
+        url: url,
+        date: date,
+        calendar: cal,
+        writer: writer
+      }
+      article.attributes = attrs
+
+      puts "article: Calendar##{cal.in_service_id}, title: #{title}" if article.changed?
+      article.save
     end
   end
 end
