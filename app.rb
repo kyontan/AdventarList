@@ -108,14 +108,14 @@ get "/calendar/:service/:in_service_id/?" do
   haml :index
 end
 
-get "/user/:service/:in_service_id/?" do
+get "/writer/:service/:in_service_id/?" do
   pass unless supported_service.include?(params[:service])
 
   @service       = params[:service]
   @in_service_id = params[:in_service_id]
 
-  @user = Writer.find_by(service: @service, in_service_id: @in_service_id)
-  @articles = @user.articles.order(:date)
+  @writer = Writer.find_by(service: @service, in_service_id: @in_service_id)
+  @articles = @writer.articles.order(:date)
 
   haml :index
 end
