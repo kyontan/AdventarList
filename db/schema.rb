@@ -27,8 +27,8 @@ ActiveRecord::Schema.define(version: 20151202165427) do
   create_table "calendars", force: :cascade do |t|
     t.string   "title"
     t.string   "description"
-    t.string   "in_service_id"
-    t.string   "service"
+    t.string   "in_service_id", null: false
+    t.string   "service",       null: false
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
   end
@@ -37,8 +37,8 @@ ActiveRecord::Schema.define(version: 20151202165427) do
 
   create_table "writers", force: :cascade do |t|
     t.string   "name"
-    t.string   "in_service_id"
-    t.string   "service"
+    t.string   "in_service_id", null: false
+    t.string   "service",       null: false
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
   end
