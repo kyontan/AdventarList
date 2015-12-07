@@ -52,17 +52,73 @@ helpers do
       today.year - 1
     end
   end
+
+  def parse_date(date_str)
+    begin
+      date = Date.parse(date_str)
+    rescue ArgumentError
+      return nil
+    end
+
+    return nil if 25 < date.day
+
+    date
+  end
+
+  def supported_service
+    Calendar.select(:service).uniq.map(&:service)
+  end
 end
 
 get "/?" do
-  # @date = Date.today
-  @date = Date.parse("12/3")
+  @date = Date.today
   @articles = Article.where(date: @date).order(:updated_at).reverse
 
   haml :index
 end
 
-# get %r{/\d{4}/\d{4}/\d{4}}
+get %r{^/(12/\d{1,2})/?$} do
+  date = parse_date(params[:captures].first)
+
+  pass if date.nil?
+
+  redirect to("/#{get_year}/#{date.month}/#{date.day}")
+end
+
+
+get %r{^/((?:20)?\d{2}/12/\d{1,2})/?$} do
+  @date = parse_date(params[:captures].first)
+
+  pass if @date.nil?
+
+  @articles = Article.where(date: @date).order(:updated_at).reverse
+
+  haml :index
+end
+
+get "/calendar/:service/:in_service_id/?" do
+  pass unless supported_service.include?(params[:service])
+
+  @service       = params[:service]
+  @in_service_id = params[:in_service_id]
+
+  @calendar = Calendar.find_by(service: @service, in_service_id: @in_service_id)
+  @articles = @calendar.articles.order(:date)
+
+  haml :index
+end
+
+get "/writer/:service/:in_service_id/?" do
+  pass unless supported_service.include?(params[:service])
+
+  @service       = params[:service]
+  @in_service_id = params[:in_service_id]
+
+  @writer = Writer.find_by(service: @service, in_service_id: @in_service_id)
+  @articles = @writer.articles.order(:date)
+
+  haml :index
+end
 
 get "/css/*" do
   file_name = params[:splat].first
