@@ -67,8 +67,7 @@ helpers do
 end
 
 get "/?" do
-  # @date = Date.today
-  @date = Date.parse("12/3")
+  @date = Date.today
   @articles = Article.where(date: @date).order(:updated_at).reverse
 
   haml :index
