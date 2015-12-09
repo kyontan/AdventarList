@@ -46,6 +46,7 @@ def update_adventar
       }
       calendar.attributes = attrs
       puts "calendar id: #{id}, title: #{title}" if calendar.changed?
+      calendar.save
     end
   end
 
@@ -80,8 +81,7 @@ def update_adventar
       }
       writer.attributes = attrs
       puts "user: #{user_name}, id: #{user_id}" if writer.changed?
-
-      writer = Writer.where(in_service_id: user_id, service: "adventar").first
+      writer.save
 
       # Article
       article = Article.find_or_create_by(date: date, calendar: cal)

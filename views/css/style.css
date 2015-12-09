@@ -64,6 +64,9 @@ table#articles thead th {
 table#articles thead th.theme {
   width: 224px;
 }
+table#articles thead th.date {
+  width: 64px;
+}
 table#articles thead th.title {
   max-width: 1024px;
 }
