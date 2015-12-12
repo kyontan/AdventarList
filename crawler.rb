@@ -13,19 +13,48 @@ require "open-uri"
 require "nokogiri"
 require "json"
 
+ActiveRecord::Base.logger.level = Logger::WARN
+$logger = Logger.new("log/crawler.log")
+
+
+class Hash
+  def slice(*keys)
+    Hash[keys.map{|k| [k, self[k]] }]
+  end
+end
+
 def parse_document(url)
   charset = nil
 
   begin
-    html = open(url) do |f|
+    options = {}
+    html = OpenURI.open_uri(url, options) do |f|
       charset = f.charset
       f.read
     end
 
     return Nokogiri::HTML.parse(html, nil, charset)
-  rescue
+  rescue => e
+    $logger.error e.to_s
     return nil
   end
+end
+
+def create_or_update(klass, attrs)
+  keys = \
+       if klass == Calendar then attrs.slice(:in_service_id, :service)
+    elsif klass == Writer   then attrs.slice(:in_service_id, :service)
+    elsif klass == Article  then attrs.slice(:date, :calendar)
+  end
+
+  instance = klass.find_or_create_by(keys)
+  instance.attributes = attrs
+
+  ret = instance.changed?
+
+  instance.save
+
+  ret
 end
 
 def update_adventar
@@ -38,27 +67,25 @@ def update_adventar
 
     calendars.each do |p|
       id, title = p["id"], p["title"]
-      calendar = Calendar.find_or_create_by(in_service_id: id, service: "adventar")
-      attrs = {
-        in_service_id: id,
-        title: title,
-        service: "adventar"
-      }
-      calendar.attributes = attrs
-      puts "calendar id: #{id}, title: #{title}" if calendar.changed?
-      calendar.save
+      if create_or_update(Calendar, {
+          in_service_id: id,
+          title: title,
+          service: "adventar"
+        })
+        $logger.info "Calendar##{id} title: #{title}"
+      end
     end
   end
 
   update_calendars
 
-  Calendar.all.each do |cal|
+  Calendar.where(service: "adventar").each do |cal|
     doc = parse_document(cal.url)
     next if doc.nil?
 
     doc.css("table.mod-entryList tr").each do |article_tree|
       user_name = article_tree.css(".mod-entryList-user a").text
-      user_id   = article_tree.css(".mod-entryList-user a").attr("href").value.match(/\d+$/)[0]
+      user_id   = article_tree.css(".mod-entryList-user a")[:href].match(/\d+$/)[0]
 
       date  = Date.parse(article_tree.css(".mod-entryList-date").text)
       title = article_tree.css(".mod-entryList-title").text
@@ -73,35 +100,102 @@ def update_adventar
 
       # Writer
 
-      writer = Writer.find_or_create_by(in_service_id: user_id, service: "adventar")
-      attrs = {
-        name: user_name,
-        in_service_id: user_id,
-        service: "adventar"
-      }
-      writer.attributes = attrs
-      puts "user: #{user_name}, id: #{user_id}" if writer.changed?
-      writer.save
+      if create_or_update(Writer, {
+          in_service_id: user_id,
+          name: user_name,
+          service: "adventar"
+          })
+        $logger.info "Writer##{user_id} name: #{user_name}"
+      end
 
       # Article
-      article = Article.find_or_create_by(date: date, calendar: cal)
-      attrs = {
-        title: title,
-        description: desc,
-        url: url,
-        date: date,
-        calendar: cal,
-        writer: writer
-      }
-      article.attributes = attrs
 
-      puts "article: Calendar##{cal.in_service_id}, title: #{title}" if article.changed?
-      article.save
+      if create_or_update(Article, {
+          title: title,
+          description: desc,
+          url: url,
+          date: date,
+          calendar: cal,
+          writer: Writer.find_by(in_service_id: user_id, service: "adventar")
+        })
+
+        $logger.info "Article: Calendar##{cal.in_service_id}, title: #{title}"
+      end
     end
   end
 end
 
-update_adventar
+def update_qiita
+  def update_calendars
+    root = URI("http://qiita.com/advent-calendar/#{Date.today.year}")
+    doc = parse_document(root)
 
-# def update_qiita
-# end
+    genres = doc.css(".adventCalendarCard_block_showAll").map{|x| x[:href] }
+    genres.each do |g|
+      doc_g = parse_document(root + g)
+      doc_g.css(".adventCalendarList_calendarTitle > a").each do |p|
+        id, title = p[:href].match(%r{(?<=/)[^/]*?$}).to_s, p.text
+        if create_or_update(Calendar, {
+            in_service_id: id,
+            title: title,
+            service: "qiita"
+          })
+          puts "Calendar##{id} title: #{title}"
+        end
+      end
+    end
+  end
+
+  update_calendars
+
+  Calendar.where(service: "qiita").each do |cal|
+    doc = parse_document(cal.url)
+    next if doc.nil?
+
+    doc.css(".adventCalendarItem_entry").map(&:parent).each do |article_tree|
+      user_name = article_tree.css(".adventCalendarItem_author").text.strip
+      user_id   = article_tree.css(".adventCalendarItem_author > a")[0][:href].match(%r{(?<=/).*$}).to_s
+
+      date  = Date.parse(article_tree.css(".adventCalendarItem_date").text.split.join)
+      title = article_tree.css(".adventCalendarItem_entry > a").text
+      desc  = ""
+      url   = article_tree.css(".adventCalendarItem_entry > a").first[:href]
+
+      if url.empty?
+        next
+      end
+
+      # Writer
+
+      if create_or_update(Writer, {
+          in_service_id: user_id,
+          name: user_name,
+          service: "qiita"
+          })
+        puts "Writer##{user_id} name: #{user_name}"
+      end
+
+      # Article
+
+      if create_or_update(Article, {
+          title: title,
+          description: desc,
+          url: url,
+          date: date,
+          calendar: cal,
+          writer: Writer.find_by(in_service_id: user_id, service: "qiita")
+        })
+
+        puts "Article: Calendar##{cal.in_service_id}, title: #{title}"
+      end
+    end
+  end
+end
+
+$logger.info "Crawler start for Adventar: #{Time.now}"
+update_adventar
+$logger.info "Crawler finished for Adventar: #{Time.now}"
+
+$logger.info "Crawler start for Qiita: #{Time.now}"
+update_qiita
+$logger.info "Crawler finished for Qiita: #{Time.now}"
