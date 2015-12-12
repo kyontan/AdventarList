@@ -14,6 +14,8 @@ require "nokogiri"
 require "json"
 
 ActiveRecord::Base.logger.level = Logger::WARN
+$logger = Logger.new("log/crawler.log")
+
 
 class Hash
   def slice(*keys)
@@ -33,7 +35,7 @@ def parse_document(url)
 
     return Nokogiri::HTML.parse(html, nil, charset)
   rescue => e
-    puts e.to_s
+    $logger.error e.to_s
     return nil
   end
 end
@@ -70,7 +72,7 @@ def update_adventar
           title: title,
           service: "adventar"
         })
-        puts "Calendar##{id} title: #{title}"
+        $logger.info "Calendar##{id} title: #{title}"
       end
     end
   end
@@ -103,7 +105,7 @@ def update_adventar
           name: user_name,
           service: "adventar"
           })
-        puts "Writer##{user_id} name: #{user_name}"
+        $logger.info "Writer##{user_id} name: #{user_name}"
       end
 
       # Article
@@ -117,7 +119,7 @@ def update_adventar
           writer: Writer.find_by(in_service_id: user_id, service: "adventar")
         })
 
-        puts "Article: Calendar##{cal.in_service_id}, title: #{title}"
+        $logger.info "Article: Calendar##{cal.in_service_id}, title: #{title}"
       end
     end
   end
@@ -190,5 +192,10 @@ def update_qiita
   end
 end
 
+$logger.info "Crawler start for Adventar: #{Time.now}"
 update_adventar
+$logger.info "Crawler finished for Adventar: #{Time.now}"
+
+$logger.info "Crawler start for Qiita: #{Time.now}"
 update_qiita
+$logger.info "Crawler finished for Qiita: #{Time.now}"
