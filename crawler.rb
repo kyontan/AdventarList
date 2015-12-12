@@ -140,7 +140,7 @@ def update_qiita
             title: title,
             service: "qiita"
           })
-          puts "Calendar##{id} title: #{title}"
+          $logger.info "Calendar##{id} title: #{title}"
         end
       end
     end
@@ -172,7 +172,7 @@ def update_qiita
           name: user_name,
           service: "qiita"
           })
-        puts "Writer##{user_id} name: #{user_name}"
+        $logger.info "Writer##{user_id} name: #{user_name}"
       end
 
       # Article
@@ -186,7 +186,7 @@ def update_qiita
           writer: Writer.find_by(in_service_id: user_id, service: "qiita")
         })
 
-        puts "Article: Calendar##{cal.in_service_id}, title: #{title}"
+        $logger.info "Article: Calendar##{cal.in_service_id}, title: #{title}"
       end
     end
   end
