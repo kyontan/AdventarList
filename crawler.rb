@@ -85,7 +85,7 @@ def update_adventar
 
     doc.css("table.mod-entryList tr").each do |article_tree|
       user_name = article_tree.css(".mod-entryList-user a").text
-      user_id   = article_tree.css(".mod-entryList-user a")[:href].match(/\d+$/)[0]
+      user_id   = article_tree.css(".mod-entryList-user a").attr("href").value.match(/\d+$/)[0]
 
       date  = Date.parse(article_tree.css(".mod-entryList-date").text)
       title = article_tree.css(".mod-entryList-title").text
