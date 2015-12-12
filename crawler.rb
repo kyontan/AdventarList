@@ -13,19 +13,46 @@ require "open-uri"
 require "nokogiri"
 require "json"
 
+ActiveRecord::Base.logger.level = Logger::WARN
+
+class Hash
+  def slice(*keys)
+    Hash[keys.map{|k| [k, self[k]] }]
+  end
+end
+
 def parse_document(url)
   charset = nil
 
   begin
-    html = open(url) do |f|
+    options = {}
+    html = OpenURI.open_uri(url, options) do |f|
       charset = f.charset
       f.read
     end
 
     return Nokogiri::HTML.parse(html, nil, charset)
-  rescue
+  rescue => e
+    puts e.to_s
     return nil
   end
+end
+
+def create_or_update(klass, attrs)
+  keys = \
+       if klass == Calendar then attrs.slice(:in_service_id, :service)
+    elsif klass == Writer   then attrs.slice(:in_service_id, :service)
+    elsif klass == Article  then attrs.slice(:date, :calendar)
+  end
+
+  instance = klass.find_or_create_by(keys)
+  instance.attributes = attrs
+
+  ret = instance.changed?
+
+  instance.save
+
+  ret
 end
 
 def update_adventar
@@ -38,15 +65,13 @@ def update_adventar
 
     calendars.each do |p|
       id, title = p["id"], p["title"]
-      calendar = Calendar.find_or_create_by(in_service_id: id, service: "adventar")
-      attrs = {
-        in_service_id: id,
-        title: title,
-        service: "adventar"
-      }
-      calendar.attributes = attrs
-      puts "calendar id: #{id}, title: #{title}" if calendar.changed?
-      calendar.save
+      if create_or_update(Calendar, {
+          in_service_id: id,
+          title: title,
+          service: "adventar"
+        })
+        puts "Calendar##{id} title: #{title}"
+      end
     end
   end
 
@@ -58,7 +83,7 @@ def update_adventar
 
     doc.css("table.mod-entryList tr").each do |article_tree|
       user_name = article_tree.css(".mod-entryList-user a").text
-      user_id   = article_tree.css(".mod-entryList-user a").attr("href").value.match(/\d+$/)[0]
+      user_id   = article_tree.css(".mod-entryList-user a")[:href].match(/\d+$/)[0]
 
       date  = Date.parse(article_tree.css(".mod-entryList-date").text)
       title = article_tree.css(".mod-entryList-title").text
@@ -73,30 +98,27 @@ def update_adventar
 
       # Writer
 
-      writer = Writer.find_or_create_by(in_service_id: user_id, service: "adventar")
-      attrs = {
-        name: user_name,
-        in_service_id: user_id,
-        service: "adventar"
-      }
-      writer.attributes = attrs
-      puts "user: #{user_name}, id: #{user_id}" if writer.changed?
-      writer.save
+      if create_or_update(Writer, {
+          in_service_id: user_id,
+          name: user_name,
+          service: "adventar"
+          })
+        puts "Writer##{user_id} name: #{user_name}"
+      end
 
       # Article
-      article = Article.find_or_create_by(date: date, calendar: cal)
-      attrs = {
-        title: title,
-        description: desc,
-        url: url,
-        date: date,
-        calendar: cal,
-        writer: writer
-      }
-      article.attributes = attrs
 
-      puts "article: Calendar##{cal.in_service_id}, title: #{title}" if article.changed?
-      article.save
+      if create_or_update(Article, {
+          title: title,
+          description: desc,
+          url: url,
+          date: date,
+          calendar: cal,
+          writer: Writer.find_by(in_service_id: user_id, service: "adventar")
+        })
+
+        puts "Article: Calendar##{cal.in_service_id}, title: #{title}"
+      end
     end
   end
 end
