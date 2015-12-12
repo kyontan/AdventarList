@@ -77,7 +77,7 @@ def update_adventar
 
   update_calendars
 
-  Calendar.all.each do |cal|
+  Calendar.where(service: "adventar").each do |cal|
     doc = parse_document(cal.url)
     next if doc.nil?
 
@@ -123,7 +123,72 @@ def update_adventar
   end
 end
 
-update_adventar
+def update_qiita
+  def update_calendars
+    root = URI("http://qiita.com/advent-calendar/#{Date.today.year}")
+    doc = parse_document(root)
 
-# def update_qiita
-# end
+    genres = doc.css(".adventCalendarCard_block_showAll").map{|x| x[:href] }
+    genres.each do |g|
+      doc_g = parse_document(root + g)
+      doc_g.css(".adventCalendarList_calendarTitle > a").each do |p|
+        id, title = p[:href].match(%r{(?<=/)[^/]*?$}).to_s, p.text
+        if create_or_update(Calendar, {
+            in_service_id: id,
+            title: title,
+            service: "qiita"
+          })
+          puts "Calendar##{id} title: #{title}"
+        end
+      end
+    end
+  end
+
+  update_calendars
+
+  Calendar.where(service: "qiita").each do |cal|
+    doc = parse_document(cal.url)
+    next if doc.nil?
+
+    doc.css(".adventCalendarItem_entry").map(&:parent).each do |article_tree|
+      user_name = article_tree.css(".adventCalendarItem_author").text.strip
+      user_id   = article_tree.css(".adventCalendarItem_author > a")[0][:href].match(%r{(?<=/).*$}).to_s
+
+      date  = Date.parse(article_tree.css(".adventCalendarItem_date").text.split.join)
+      title = article_tree.css(".adventCalendarItem_entry > a").text
+      desc  = ""
+      url   = article_tree.css(".adventCalendarItem_entry > a").first[:href]
+
+      if url.empty?
+        next
+      end
+
+      # Writer
+
+      if create_or_update(Writer, {
+          in_service_id: user_id,
+          name: user_name,
+          service: "qiita"
+          })
+        puts "Writer##{user_id} name: #{user_name}"
+      end
+
+      # Article
+
+      if create_or_update(Article, {
+          title: title,
+          description: desc,
+          url: url,
+          date: date,
+          calendar: cal,
+          writer: Writer.find_by(in_service_id: user_id, service: "qiita")
+        })
+
+        puts "Article: Calendar##{cal.in_service_id}, title: #{title}"
+      end
+    end
+  end
+end
+
+update_adventar
+update_qiita
