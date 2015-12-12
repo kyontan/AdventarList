@@ -6,18 +6,6 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
-
-    connect: {
-      html: {
-        options: {
-          base: '',
-          keepalive: 'true',
-          hostname: '0.0.0.0',
-          port: '9999'
-        }
-      }
-    },
-
     postcss: {
       options: {
         map: false,
@@ -35,8 +23,8 @@ module.exports = function(grunt) {
     sass: {
       style: {
         files: [{
-          cwd: 'sass/',
-          dest: 'css/',
+          cwd: 'views/sass/',
+          dest: 'views/css/',
           expand: true,
           ext: '.css',
           src: ['*.scss']
@@ -50,20 +38,23 @@ module.exports = function(grunt) {
 
     watch: {
       style: {
-        files: ['js/src/*.js', 'sass/*.scss'],
+        files: ['views/js/src/*.js', 'views/sass/*.scss'],
         tasks: ['sass:style', 'postcss:style']
       }
     },
 
     browserSync: {
       bsFiles: {
-        src: ['*.html', 'js/*.js', 'css/*.css'],
+        src: ['views/*.haml', 'public/*.html',
+              'views/js/*.js', 'public/*.js',
+              'views/css/*.css', 'public/*.css']
       },
       options: {
         watchTask: true,
-        server: {
-          baseDir: "./"
-        }
+        proxy: `http://127.0.0.1:${grunt.option("port") || "9393"}`,
+        // server: {
+        //   baseDir: "./"
+        // }
       }
     },
 
@@ -77,5 +68,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  grunt.registerTask('default', [/* 'browserSync', */ 'watch']);
+
+
+  grunt.registerTask("default", ["browserSync", "watch"]);
 };
