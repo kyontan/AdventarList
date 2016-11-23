@@ -6,7 +6,7 @@ class Calendar < ActiveRecord::Base
     when "adventar"
       "http://www.adventar.org/calendars/#{in_service_id}"
     when "qiita"
-      "http://qiita.com/advent-calendar/#{Date.today.year}/#{in_service_id}"
+      "http://qiita.com/advent-calendar/#{year}/#{in_service_id}"
     end
   end
 end
