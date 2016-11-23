@@ -72,10 +72,13 @@ crawlers = [
   c.new(store: CrawlerStore.instance, logger: logger)
 end
 
+today = Date.today
+year = today.month == 12 ? today.year : (today.year - 1)
+
 crawlers.each do |crawler|
   logger.info "Crawler start for #{crawler.service_name}: #{Time.now}"
   begin
-    crawler.crawl_all
+    crawler.crawl_all(year: year)
   rescue => e
     $logger.error e.to_s
   end
