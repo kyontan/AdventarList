@@ -189,13 +189,22 @@ def update_qiita
         $logger.info "Article: Calendar##{cal.in_service_id}, title: #{title}"
       end
     end
+    sleep 1
   end
 end
 
 $logger.info "Crawler start for Adventar: #{Time.now}"
-update_adventar
+begin
+  update_adventar
+rescue => e
+  $logger.error e.to_s
+end
 $logger.info "Crawler finished for Adventar: #{Time.now}"
 
 $logger.info "Crawler start for Qiita: #{Time.now}"
-update_qiita
+begin
+  update_qiita
+rescue => e
+  $logger.error e.to_s
+end
 $logger.info "Crawler finished for Qiita: #{Time.now}"
