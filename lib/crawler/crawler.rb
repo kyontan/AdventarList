@@ -39,6 +39,8 @@ class Crawler
 
   def base_url; end
 
+  def url_of_calendar_list(year: ); end
+
   def service_identifier; end
 
   def parse_calendar_list_page(doc:, year:); end
