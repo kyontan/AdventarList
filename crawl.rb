@@ -14,10 +14,6 @@ require_relative "lib/crawler/adventar"
 Time.zone = "Asia/Tokyo"
 ActiveRecord::Base.default_timezone = :local
 ActiveRecord::Base.logger.level = Logger::WARN
-ActiveRecord::Base.establish_connection(
-  adapter:  "sqlite3",
-  database: "db/#{RACK_ENV}.sqlite3"
-)
 
 logger = Logger.new("log/crawler.log")
 

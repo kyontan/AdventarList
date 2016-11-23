@@ -35,7 +35,6 @@ configure do
   set :haml, cdata: false
   set :scss, style: :expanded
   # set :markdown, filter_html: true
-  set :database, {adapter: "sqlite3", database: "db/#{settings.environment}.sqlite3"}
 end
 
 helpers do
