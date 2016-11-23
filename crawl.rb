@@ -19,7 +19,7 @@ ActiveRecord::Base.establish_connection(
   database: "db/#{RACK_ENV}.sqlite3"
 )
 
-$logger = Logger.new("log/crawler.log")
+logger = Logger.new("log/crawler.log")
 
 class Hash
   def slice(*keys)
@@ -68,12 +68,12 @@ end
 crawlers = [
   Crawler::Qiita,
   Crawler::Adventar,
-].each do |c|
-  c.new(store: CrawlerStore.instance)
+].map do |c|
+  c.new(store: CrawlerStore.instance, logger: logger)
 end
 
 crawlers.each do |crawler|
-  $logger.info "Crawler start for #{crawler.service_name}: #{Time.now}"
+  logger.info "Crawler start for #{crawler.service_name}: #{Time.now}"
   begin
     crawler.crawl_all
   rescue => e
