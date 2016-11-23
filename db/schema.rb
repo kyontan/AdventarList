@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151202165427) do
+ActiveRecord::Schema.define(version: 20161123075226) do
 
   create_table "articles", force: :cascade do |t|
     t.string   "title"
@@ -27,18 +27,19 @@ ActiveRecord::Schema.define(version: 20151202165427) do
   create_table "calendars", force: :cascade do |t|
     t.string   "title"
     t.string   "description"
-    t.string   "in_service_id", null: false
-    t.string   "service",       null: false
+    t.string   "in_service_id"
+    t.string   "service"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+    t.integer  "year",          null: false
   end
 
   add_index "calendars", ["in_service_id", "service"], name: "index_calendars_on_in_service_id_and_service", unique: true
 
   create_table "writers", force: :cascade do |t|
     t.string   "name"
-    t.string   "in_service_id", null: false
-    t.string   "service",       null: false
+    t.string   "in_service_id"
+    t.string   "service"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
   end
