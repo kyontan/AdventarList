@@ -37,6 +37,10 @@ class Crawler
 
   private
 
+  def strip(str)
+    str.gsub("\u00a0", " ").strip # &nbsp;
+  end
+
   def base_url; end
 
   def url_of_calendar_list(year: ); end

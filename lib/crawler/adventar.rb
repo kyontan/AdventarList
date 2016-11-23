@@ -27,7 +27,7 @@ class Crawler::Adventar < Crawler
       id = title_el.css("a").attr("href").value.match(/\d+$/).to_s
 
       changed = save_calendar(
-        title: title_el.text.strip,
+        title: strip(title_el.text),
         in_service_id: id,
         year: year,
       )
@@ -44,15 +44,17 @@ class Crawler::Adventar < Crawler
     @logger&.debug "#{service_name}: Crawling: #{cal.url}, #{entries.count} entries."
 
     entries.each do |entry|
-      user_name = entry["user"]["name"]
+      user_name = strip(entry["user"]["name"])
       user_id   = entry["user"]["id"]
 
-      date  = Date.parse(entry["date"])
-      title = entry["title"]
-      desc  = entry["comment"]
       url   = entry["url"]
 
+      # if no entry
       next if url.nil? || url.empty?
+
+      date  = Date.parse(entry["date"])
+      title = entry["title"].nil?   ? "" : strip(entry["title"])
+      desc  = entry["comment"].nil? ? "" : strip(entry["comment"])
 
       changed = save_writer(
         in_service_id: user_id,
