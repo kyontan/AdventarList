@@ -18,9 +18,8 @@
       - date_str = @date.next_day.strftime(date_fmt)
       %a#link-next{href: to(date_str)}= "#{date_str}の記事一覧"
     - if Date.today.day == 25
-      Merry christmas!
+      🎄Merry Xmas!🎄
 
-  -# %h1 Qiita Advent Calendar
   - if @articles.empty?
     %div.no-article
       記事がありません
