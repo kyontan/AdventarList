@@ -12,6 +12,7 @@ class Crawler
   def service_name; end
 
   def crawl_all(year: Date.today.year, in_service_id: nil)
+    @logger&.info "#{service_name}: crawl all in #{year}"
     crawl_only_calendars(year: year)
 
     attrs = {
