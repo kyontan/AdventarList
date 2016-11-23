@@ -80,7 +80,7 @@ crawlers.each do |crawler|
   begin
     crawler.crawl_all(year: year)
   rescue => e
-    $logger.error e.to_s
+    logger.error e.to_s
   end
-  $logger.info "Crawler finished for #{crawler.service_name}: #{Time.now}"
+  logger.info "Crawler finished for #{crawler.service_name}: #{Time.now}"
 end
