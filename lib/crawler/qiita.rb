@@ -96,7 +96,7 @@ class Crawler::Qiita < Crawler
         writer: get_writer(in_service_id: user_id),
       )
 
-      @logger&.info "#{service_name}: updated article: #{title} (cal##{cal.in_service_id})" if changed
+      @logger&.info "#{service_name}: updated article: #{title} (##{cal.in_service_id})" if changed
     end
   end
 
