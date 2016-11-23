@@ -35,9 +35,17 @@ class CrawlerStore
     create_or_update(Calendar, keys, attrs)
   end
 
+  def get_calendars(attrs)
+    Calendar.where(attrs)
+  end
+
   def save_writer(attrs)
     keys = attrs.slice(:in_service_id, :service)
     create_or_update(Writer, keys, attrs)
+  end
+
+  def get_writer(attrs)
+    Writer.find_by(attrs)
   end
 
   def save_article(attrs)
@@ -50,10 +58,10 @@ class CrawlerStore
     instance = klass.find_or_create_by(keys)
     instance.attributes = attrs
 
-    ret = instance.changed?
+    changed = instance.changed?
     instance.save
 
-    ret
+    changed
   end
 end
 
