@@ -1,4 +1,5 @@
 class Calendar < ActiveRecord::Base
+  serialize :metadata, Oj
   has_many :articles
 
   def url
@@ -12,6 +13,7 @@ class Calendar < ActiveRecord::Base
 end
 
 class Writer < ActiveRecord::Base
+  serialize :metadata, Oj
   has_many :articles
 
   def url
@@ -25,6 +27,7 @@ class Writer < ActiveRecord::Base
 end
 
 class Article < ActiveRecord::Base
+  serialize :metadata, Oj
   belongs_to :calendar
   belongs_to :writer
 end
