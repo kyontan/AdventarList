@@ -8,6 +8,7 @@ gem "sinatra-activerecord", require: "sinatra/activerecord"
 gem "rake"
 
 gem "dotenv"
+gem "oj"
 
 group :development do
 	gem "pry", require: false

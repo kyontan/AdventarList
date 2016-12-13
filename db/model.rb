@@ -1,4 +1,5 @@
 class Calendar < ActiveRecord::Base
+  serialize :metadata, Oj
   has_many :articles
 
   def url
@@ -6,12 +7,13 @@ class Calendar < ActiveRecord::Base
     when "adventar"
       "http://www.adventar.org/calendars/#{in_service_id}"
     when "qiita"
-      "http://qiita.com/advent-calendar/#{Date.today.year}/#{in_service_id}"
+      "http://qiita.com/advent-calendar/#{year}/#{in_service_id}"
     end
   end
 end
 
 class Writer < ActiveRecord::Base
+  serialize :metadata, Oj
   has_many :articles
 
   def url
@@ -25,6 +27,7 @@ class Writer < ActiveRecord::Base
 end
 
 class Article < ActiveRecord::Base
+  serialize :metadata, Oj
   belongs_to :calendar
   belongs_to :writer
 end

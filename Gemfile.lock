@@ -37,6 +37,7 @@ GEM
     minitest (5.8.3)
     nokogiri (1.6.7)
       mini_portile2 (~> 2.0.0.rc2)
+    oj (2.17.5)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -74,6 +75,7 @@ DEPENDENCIES
   dotenv
   haml
   nokogiri
+  oj
   pry
   rake
   shotgun
@@ -83,4 +85,4 @@ DEPENDENCIES
   thin
 
 BUNDLED WITH
-   1.10.6
+   1.13.6

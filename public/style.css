@@ -19,9 +19,11 @@ h1 {
   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, Verdana, Roboto, "游ゴシック", "Yu Gothic", "游ゴシック体", "YuGothic", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "Meiryo UI", "メイリオ", Meiryo, "MS Pゴシック", "MS PGothic", sans-serif;
   font-weight: 600;
 }
+
 h1 a {
   color: black;
 }
+
 h1 a:visited {
   color: black;
 }
@@ -35,10 +37,12 @@ a {
   text-decoration: none;
   color: #006cc4;
 }
+
 a:hover {
   text-decoration: underline;
   color: #004780;
 }
+
 a:visited {
   color: #7C7C7C;
 }
@@ -55,34 +59,43 @@ table#articles {
   width: 100%;
   table-layout: fixed;
 }
+
 table#articles thead {
   font-size: 1.25em;
 }
+
 table#articles thead th {
   padding: 0 .5em .32em;
 }
+
 table#articles thead th.theme {
   width: 224px;
 }
+
 table#articles thead th.date {
   width: 64px;
 }
+
 table#articles thead th.title {
   max-width: 1024px;
 }
+
 table#articles thead th.writer {
   width: 160px;
 }
+
 table#articles tbody td {
   border-top: 1px solid #ccc;
   padding: .25em .1em;
 }
+
 table#articles tbody td.title a {
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
 }
+
 table#articles tbody td.writer {
   font-size: .95em;
 }
@@ -99,29 +112,25 @@ header, main, footer {
   body {
     width: 100%;
   }
-
   table#articles td.theme {
     width: auto;
   }
 }
+
 @media screen and (max-width: 639px) {
   header, main, footer {
     margin: 0 .5em;
   }
-
   h1 {
     font-size: 2em;
   }
-
   h2 {
     display: block;
     margin: .25em 0;
   }
-
   a[id*=link] {
     margin-left: 0;
   }
-
   table#articles thead {
     display: none;
   }
