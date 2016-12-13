@@ -73,24 +73,30 @@ helpers do
     [nil, "json"].include? format
   end
 
-  def articles_to_json(articles)
-    articles.to_json(
+  def articles_as_json(articles, except_writer: false, except_calendar: false)
+    opts = {
       include: {
-        :writer   => { only: [:name,  :in_service_id, :service] },
-        :calendar => { only: [:title, :in_service_id, :service] }
+        writer:   { only: [:name,  :in_service_id, :service] },
+        calendar: { only: [:title, :in_service_id, :service] }
       },
       except: [
-        :id, :created_at, :updated_at, :calendar_id, :writer_id
+        :created_at, :updated_at, :calendar_id, :writer_id
       ]
-    )
+    }
+
+    opts[:include].delete(:writer)   if except_writer
+    opts[:include].delete(:calendar) if except_calendar
+
+    { articles: articles.as_json(opts) }
   end
-end
 
-get "/?" do
-  @date = Date.today
-  @articles = Article.where(date: @date).includes(:calendar, :writer).order(:updated_at).reverse
+  def writer_as_json(writer)
+    { writer: writer.as_json(only: [:name,  :in_service_id, :service]) }
+  end
+  def calendar_as_json(calendar)
+    { calendar: calendar.as_json(only: [:title, :in_service_id, :service]) }
+  end
 
-  haml :index
 end
 
 get %r{^/(12/\d{1,2})\.?(json)?$} do
@@ -104,27 +110,19 @@ get %r{^/(12/\d{1,2})\.?(json)?$} do
 end
 
 
-get %r{^/((?:20)?\d{2}/12/\d{1,2})\.?(json)?$} do
+get %r{^/((?:20)?\d{2}/12/\d{1,2}).json$} do
   @date = parse_date(params[:captures].first)
-  format = params[:captures].last
-  halt 404 if not is_supported_format?(format)
 
   pass if @date.nil?
 
   @articles = Article.where(date: @date).includes(:calendar, :writer).order(:updated_at).reverse
 
-  if format == "json"
-    content_type :json
-    articles_to_json @articles
-  else
-    haml :index
-  end
+  content_type :json
+  articles_as_json(@articles).to_json
 end
 
-get "/calendar/:service/:in_service_id.?:format?" do
+get "/calendar/:service/:in_service_id.json" do
   pass unless is_supported_service?.include?(params[:service])
-  format = params[:format]
-  halt 404 if not is_supported_format?(format)
 
   @service       = params[:service]
   @in_service_id = params[:in_service_id]
@@ -133,18 +131,13 @@ get "/calendar/:service/:in_service_id.?:format?" do
   halt 404 if @calendar.nil?
   @articles = @calendar.articles.includes(:writer).order(:date)
 
-  if format == "json"
-    content_type :json
-    articles_to_json @articles
-  else
-    haml :index
-  end
+  content_type :json
+  articles_as_json(@articles, except_calendar: true).merge(calendar_as_json(@calendar)).to_json
+
 end
 
-get "/writer/:service/:in_service_id.?:format?" do
+get "/writer/:service/:in_service_id.json" do
   pass unless is_supported_service?.include?(params[:service])
-  format = params[:format]
-  halt 404 if not is_supported_format?(format)
 
   @service       = params[:service]
   @in_service_id = params[:in_service_id]
@@ -153,12 +146,8 @@ get "/writer/:service/:in_service_id.?:format?" do
   halt 404 if @writer.nil?
   @articles = @writer.articles.includes(:calendar).order(:date)
 
-  if format == "json"
-    content_type :json
-    articles_to_json @articles
-  else
-    haml :index
-  end
+  content_type :json
+  articles_as_json(@articles, except_writer: true).merge(writer_as_json(@writer)).to_json
 end
 
 get "/css/*" do
@@ -181,6 +170,10 @@ get "/js/*.js" do
   else
     halt 404
   end
+end
+
+get "/*" do
+  send_file Pathname(settings.public_dir) + "index.html"
 end
 
 not_found do

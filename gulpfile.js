@@ -23,10 +23,9 @@ gulp.task('sass', function() {
     .pipe(gulp.dest(paths.dst));
 });
 
-
 function compile(watch) {
   var js_bundler = watchify(browserify(`${paths.src}/index.js`, { debug: true })
-    .transform(babelify, { presets: ['es2015'] }));
+    .transform(babelify, { presets: ['es2015', 'react'] }));
 
   function js_rebundle() {
       return js_bundler
